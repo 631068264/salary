@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd ">
+
+	<!-- 注解支持 -->
+    <mvc:annotation-driven/>
+    <!-- 调度任务支持 -->
+    <task:annotation-driven/>
+    <!-- 启动组件扫描，排除@Controller组件，该组件由SpringMVC配置文件扫描 -->
+    <context:component-scan base-package="com.web.*"/>
+    <!-- 启动切面事务处理，没有的话没法执行更新事务 -->
+    <aop:aspectj-autoproxy/>
+    <!-- 指定静态文件--> 
+    <mvc:resources location="/resources/" mapping="/resources/**"/>
+	<!-- 加载外部的properties配置文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+		<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 请求映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" >
+		<property name="cacheSeconds" value="0" />
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+						<property name="supportedMediaTypes" value="application/json" />
+				</bean>
+			</list>
+		</property>
+	</bean>	
+	 <!-- 数据库连接池  基本信息-->    
+	 <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	  	<property name="jdbcUrl" value="${jdbcUrl}"/>
+		<property name="driverClass" value="${driverClass}"/>
+		<property name="user" value="${username}"/>
+		<property name="password" value="${password}"/>
+	  <!-- 其他信息 -->
+	  	<property name="autoCommitOnClose" value="true"/>
+		<property name="checkoutTimeout" value="${cpool.checkoutTimeout}"/>
+	  <!--初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+		<property name="initialPoolSize" value="${cpool.minPoolSize}"/>
+		<!--连接池中保留的最小连接数。Default: 3 -->
+		<property name="minPoolSize" value="${cpool.minPoolSize}"/>
+		<!--连接池中保留的最大连接数。Default: 15 -->
+		<property name="maxPoolSize" value="${cpool.maxPoolSize}"/>
+		<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+		<property name="acquireIncrement" value="${cpool.acquireIncrement}"/>
+		<!--最大空闲时间,1800秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
+		<property name="maxIdleTime" value="${cpool.maxIdleTime}"/>
+	</bean>       
+	
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    	<property name="persistenceUnitName" value="simple" />
+        <property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml"></property>
+        <property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+		<property name="jpaDialect" ref="jpaDialect" />
+		
+	</bean>      
+		
+ 	<!-- 用于指定持久化实现厂商类 -->
+	<bean id="persistenceProvider" class="org.hibernate.ejb.HibernatePersistence" />
+	<!-- 用于设置JPA实现厂商的特定属性 -->
+	<bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="generateDdl" value="false" />  
+		<property name="database" value="${dataBaseType}" />
+	</bean>
+	<!-- 用于指定一些高级特性 -->
+	<bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	
+	
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	
+	<!-- 注解式事务 --> 
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	
+    
+	
+	<import resource="security.xml"/>
+
+</beans>

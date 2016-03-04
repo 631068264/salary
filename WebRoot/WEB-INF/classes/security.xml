@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:sec="http://www.springframework.org/schema/security"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+        http://www.springframework.org/schema/security  
+        http://www.springframework.org/schema/security/spring-security-3.1.xsd"> 
+         
+	<sec:global-method-security pre-post-annotations="enabled"/>
+	
+	 <!--use-expressions="true" 的意思是开启表达式 access-denied-page的意思是，当验证权限失败后会跳转到的页面  -->  
+    <sec:http auto-config="true" use-expressions="true" access-denied-page="/noPermission.html" >  
+		 <!-- 对登录页面，所有的用户都可以访问 hasRole('')-->       
+        <sec:intercept-url pattern="/salaryManage/**"  access="hasRole('MANAGER')"/>  
+        <sec:intercept-url pattern="/departManage/**"  access="hasRole('ADMIN')" />  
+        <sec:intercept-url pattern="/adminManage/**"  access="hasRole('ADMIN')" /> 
+        <sec:intercept-url pattern="/resources/**"  access="permitAll" />  
+         
+        <sec:intercept-url pattern="/loginManage/**"  access="permitAll" />  
+        <sec:intercept-url pattern="/login.html"  access="permitAll" />  
+        <sec:intercept-url pattern="/**"  access="isAuthenticated()" />  
+        <!-- 
+        <sec:intercept-url pattern="/**"  access="permitAll" />  
+          -->
+		<!-- 设置登录拦截器   -->
+  		<sec:custom-filter before="FORM_LOGIN_FILTER" ref="validateCodeAuthenticationFilter" />
+		
+		<!-- 对登录页面，所有的用户都可以访问 -->
+		<sec:form-login login-page="/login.html" authentication-failure-url="/login.html" default-target-url="/indexManage/success" /> 
+        <sec:remember-me/>  
+		
+		<!-- 退出配置 -->
+		<sec:logout invalidate-session="true" logout-success-url="/login.html" logout-url="/logout"/>
+		
+  		 
+	</sec:http>
+
+
+
+
+	<!-- 权限管理者 -->
+	<sec:authentication-manager alias="authenticationManager">
+		<!-- 权限提供者 -->
+		<sec:authentication-provider ref="authenticationProvider"/>
+	</sec:authentication-manager>
+	 
+	 <bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">  
+	    <property name="hideUserNotFoundExceptions" value="false" />  
+	    <property name="userDetailsService" ref="realmService" />  
+	    
+    	<property name="passwordEncoder" ref="md5PasswordEncoder"/>
+    	<property name="saltSource" ref="saltSource"/>    
+	</bean>  
+	
+	<!-- MD5加密 -->
+     <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" >
+     	<property name="encodeHashAsBase64" value="false" />   
+     </bean>  
+     <!-- 通过动态的加密盐进行加密，该配置通过用户名提供加密盐, 通过UserDetails的getUsername()方式 -->
+     <bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+     	 <property name="userPropertyToUse" value="getUsername" />
+     </bean>      
+     
+      <!-- 验证码校验 -->
+	<bean id="validateCodeAuthenticationFilter" class="com.web.filter.ValidateCodeAuthenticationFilter">  
+	    <property name="postOnly" value="false"/>  
+	    <property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler"/>
+	    <property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler"/>  
+	    <property name="authenticationManager" ref="authenticationManager"/>  
+	</bean>  
+       
+	<bean id="loginLogAuthenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+		<!--由于设置<sec:custom-filter 拦截了 所以 <sec:form-login 的default-target-url属性失效--> 
+		<!-- 登录成功路径 -->
+	    <property name="defaultTargetUrl" value="/indexManage/success"/>  
+	</bean>  
+	
+	<bean id="simpleUrlAuthenticationFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+		<!-- 验证码错误返回 --> 
+	    <property name="defaultFailureUrl" value="/login.html"/>  
+	</bean>  
+	
+	
+
+</beans>

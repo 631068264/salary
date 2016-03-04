@@ -1,0 +1,58 @@
+﻿
+
+		<!--分页功能-->
+		<div class="muted pull-left">
+  			页次：{{pager.currentPage}}/{{pager.pageCount}}页 &nbsp;
+			每页显示：{{pager.pageSize }}条 &nbsp;
+			总记录数：{{pager.recordCount}}条
+  		</div>
+		<div class="alert ">
+			<!--分页器-->
+	  		<div class="pagination pagination-centered">
+	  		
+	  			<ul>
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(1);" title="首页">首页</a>
+	  				</li>	
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(pager.currentPage - 10);" 
+						ng-if="pager.currentPage - 10 > 0"
+						title="上十页">上十页</a>
+	  				</li>	
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(pager.currentPage - 1);" 
+						ng-if="pager.currentPage - 1 > 0"
+						title="上一页">&laquo;</a>
+	  				</li>	
+	  				
+					<li ng-repeat="num in pageArray">
+		  				<a href="#" ng-if="pager.currentPage == num" ng-bind="num"></a>
+		  				<a href="javascript:void(0)" ng-if="pager.currentPage != num" ng-bind="num" class="active"
+						ng-click="gotoPage(num );"></a>
+	  				</li>
+					
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(pager.currentPage + 1);" 
+						ng-if="pager.currentPage + 1 <= pager.pageCount"
+						title="下一页">&raquo;</a>
+	  					
+	  				</li>	
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(pager.currentPage + 10);" 
+						ng-if="pager.currentPage + 10 <= pager.pageCount"
+						title="后十页">后十页</a>
+	  				</li>	
+	  				<li>
+	  					<a href="javascript:void(0)" ng-click="gotoPage(pager.pageCount );" title="尾页">尾页</a>
+	  				</li>	
+					
+				</ul>
+				<div class="pull-right">
+					转到<select id="pn" ng-change="gotoPage(pn)" ng-model="pn" 
+					ng-options="num for num in selectArray"class="span1">
+					</select>	
+				</div>
+	  		</div><!--end pagination-->
+  		</div>	
+	
+	

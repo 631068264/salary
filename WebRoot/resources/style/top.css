@@ -1,0 +1,23 @@
+@CHARSET "UTF-8";
+#top1 {
+height: 30px;
+background: #DCDCDC;
+text-align: right;
+}
+#top1 a {
+text-decoration: none;
+color: black;
+margin: 5px 10px;
+}
+#top1 a:hover {
+color: red;
+}
+#top1 a:active {
+color: blue;
+}
+#head {
+margin: 0 auto;
+height: 60px;
+text-align: left;
+background: #C03;
+}

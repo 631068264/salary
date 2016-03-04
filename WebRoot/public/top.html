@@ -1,0 +1,50 @@
+﻿  	<div class="container" ng-controller="MenuCtrl">
+  		<div class="navbar navbar-inverse navbar-fixed-top">
+  			<div class="navbar-inner">
+  			
+  				<!--导航响应-->
+				<a href="#" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" >
+					<span class="icon-list icon-white"></span>
+				</a>
+				
+  				<a class="brand" href="#">工资管理系统</a>
+				<div class="nav-collapse">	
+				<!-- 菜单导航-->
+				<ul class="nav">
+				<!--顶级菜单 -->
+				<li><a href="javascript: window.history.back(-1);" title="后退"><i class="icon-chevron-left icon-white"></i>后退</a></li>
+					<li><a href="/salary/indexManage/index"><i class="icon-home icon-white"></i>首页</a></li>
+					<li class="dropdown" ng-repeat="list in privilegeList">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-bind="list.name"><span class="caret"></span></a>
+						<!--子菜单-->
+						<ul class="dropdown-menu" >
+							
+							<li ng-repeat="c in list.children">
+								<a ng-href="/salary{{c.url}}" ng-bind="c.name"></a>
+							</li>
+							
+						</ul>
+					
+					</li>
+				</ul><!--end nav -->
+				
+				<!--其他用户信息-->
+				<ul class="nav pull-right">
+					<li><a href="#"><i class="icon-user icon-white"></i> {{user.userName}}</a></li>
+					<li><a href="javascript: window.location.reload(true);"><i class="icon-repeat icon-white"></i>刷新</a></li>
+					<!-- 
+					<li><a href="javascript: window.history.back(-1);">后退</a></li>
+					-->
+					<li class="divider-vertical"></li>
+					<li><a href="/salary/logout" >退出</a></li>					
+				</ul>
+				
+  			</div><!-- end nav-collapse-->
+  			
+  			</div><!-- navbar-inner-->
+  		</div>
+  		
+  	</div>
+  
+   		
+

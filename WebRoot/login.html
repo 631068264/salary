@@ -1,0 +1,180 @@
+﻿<!DOCTYPE HTML>
+<html ng-app>
+  <head>
+  	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=0;">
+	<link href="./resources/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+	<link href="./resources/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" >
+	<script src="./resources/bootstrap/js/jquery.js"></script>
+	<script src="./resources/bootstrap/js/bootstrap.min.js"></script>
+	<script src="./resources/bootstrap/js/angular.min.js"></script>
+	
+    <title>登录页面</title>
+	
+	 <script type="text/javascript">
+	
+	  function chage(img){//图片刷新
+		img.src = img.src+"?"+new Date().getTime();
+		}
+		
+	var userCtrl = ['$scope', '$http', function($scope, $http) { 
+	$scope.user={
+		name:"",
+		password:"",
+		code:""
+	};
+	$scope.error={
+		code:false,
+		name:false
+	};
+	
+	
+	var code = false;
+	$scope.code = function(){//验证码验证
+		var c = $scope.user.code; 
+		if($scope.user.code.length == 4 && !$scope.error.code)
+		 $http.get('./loginManage/validCode').success(function(data) {
+	   	  	if(c != data){
+				code = true;
+			}else{
+				code = false;
+			}
+			$scope.error.code = true;
+	  });
+	  return code;
+	}
+	
+	var role = false;
+	$scope.role = function (){
+		if($scope.user.name.length >4 && $scope.user.password.length >4 && !$scope.error.name){
+			var n = $scope.user.name;
+			var p = $scope.user.password;
+			$http.get('./loginManage/validUser',{params:{userID:n,password:p}}).success(function(data){
+				if(data == "false"){
+					role = true;
+				}else{
+					role = false;
+				}
+				$scope.error.name =true;
+			});
+		}
+		return role;
+	}
+				
+			
+	}];
+		
+	 </script>
+	<style>
+	 	.error{color:red}
+	 </style>
+  </head>
+  
+  <body >
+ 
+  	<div class="container-fluid">
+  		<header>
+			<div class="navbar">
+				<div class="navbar-inner">
+					<a href="#" class="brand"><h3>工资管理系统</h3></a>
+				</div>
+			</div>
+  		</header>
+  		<div class="row-fluid">
+  			<div class="span8">
+  				<div class="hero-unit">
+	              <h2>您好 欢迎</h2>
+	             <div class="carousel slide" id="carousel">
+					<ol class="carousel-indicators">
+			          <li data-target="#carousel" data-slide-to="0" class="active"></li>
+			          <li data-target="#carousel" data-slide-to="1"></li>
+			          <li data-target="#carousel" data-slide-to="2"></li>
+			        </ol>
+					
+					<div class="carousel-inner">
+						
+						<div class="item active">
+							<img src="http://placehold.it/940x360/ABCDEF&text=demo1" alt="">
+							<div class="carousel-caption">
+								<h4>标题1</h4>
+								<p>描述1</p>
+							</div>
+						</div>	
+						
+						<div class="item">
+							<img src="http://placehold.it/940x360/FEDCBA&text=demo2" alt="">
+							<div class="carousel-caption">
+								<h4>标题2</h4>
+								<p>描述2</p>
+							</div>
+						</div>	
+						
+						<div class="item">
+							<img src="http://placehold.it/940x360/2131313/FFFFFF&text=demo3" alt="">
+							<div class="carousel-caption">
+								<h4>标题3</h4>
+								<p>描述3</p>
+							</div>
+						</div>	
+						
+						</div><!--carousel-inner -->	
+						<a href="#carousel" data-slide="prev" class="left carousel-control">&lsaquo;</a>
+						<a href="#carousel" data-slide="next" class="right carousel-control">&rsaquo;</a>
+					</div><!-- carousel-->
+	            </div>
+  			</div>
+  			<div class="span4" >
+  				<form  name="form" action="./j_spring_security_check" method="post" class="form-horizontal" ng-controller="userCtrl" novalidate>
+  					<legend>用户登录</legend>
+				<div class="control-group">
+					<label class="control-label">员工编号:</label>
+					<div class="controls">
+						<input type="text"  id="name" name="j_username" ng-model="user.name" placeholder="输入员工编号" required ng-trim="true" >
+						<p class="help-block error" ng-show="form.j_username.$error.required && form.j_username.$dirty">员工编号不为空</p>
+					</div>
+				</div>
+				
+				<div class="control-group">
+					<label class="control-label">密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:</label>
+					<div class="controls">
+						<input type="password" id="password" name="j_password" ng-model="user.password" placeholder="输入密码" required ng-trim="true" ng-change="error.name=false">
+						<p class="help-block error" ng-show="form.j_password.$error.required && form.j_password.$dirty">密码不为空</p>
+						<p class="help-block error" ng-show="role()">用户不存在或者密码错误</p>
+					</div>
+				</div>
+				
+				<div class="control-group">
+					<label class="control-label">验证码:</label>
+					<div class="controls">
+						<input type="text" id="code" name="code"  placeholder="输入验证码" ng-model="user.code" required ng-trim="true" ng-change="error.code=false">
+						<img src="./loginManage/code" onclick="chage(this)" alt="换一张" >
+						<p class="help-block error" ng-show="form.code.$error.required && form.code.$dirty">验证码不为空</p>
+						<p class="help-block error" ng-show="code()">验证码错误</p>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">记住我:</label>
+					<div class="controls">
+						<input type="checkbox"  name="_spring_security_remeber_me" ng-checked="true">
+					</div>
+				</div>
+				<div class="form-actions">
+					<input type="submit" class="btn btn-primary pull-right " value="登录" ng-disabled="form.$invalid || role()||code()">
+				</div>
+	    					
+  				</form>
+				
+  			</div>
+			
+  		</div>
+		
+  	</div>
+	
+		
+			
+	
+	    				
+	    		
+  
+  </body>
+</html>

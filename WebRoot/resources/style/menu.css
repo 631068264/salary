@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+ul.level1{
+	list-style:none;
+}
+ul.level2{
+	list-style:none;
+}
+#left {
+background: #DCDCDC;
+height: 100%;
+}
+#menu {
+margin: 0 auto;
+
+}
+#menu {
+font: 20px verdana,arial,sans-serif;
+}
+#menu li a {
+display: block;
+padding: 10px;
+color: blue;
+text-decoration: none;
+}
+#menu li a:hover {
+color: red;
+}
+#menu li a:active {
+color: green;
+}
